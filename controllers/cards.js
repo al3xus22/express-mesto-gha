@@ -53,16 +53,16 @@ const likeCard = (req, res) => {
   )
     .then((card) => {
       if (card) {
-        res.send({data: card});
+        res.send({ data: card });
       } else {
-        res.status(404).send({message: 'Карточка не найдена'})
+        res.status(404).send({ message: 'Карточка не найдена' })
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({message: 'Некорректный Id карточки'});
+        res.status(400).send({ message: 'Некорректный Id карточки' });
       } else {
-        res.status(500).send({message: 'Что-то пошло не так!'});
+        res.status(500).send({ message: 'Что-то пошло не так!' });
       }
     });
 };
@@ -75,16 +75,16 @@ const dislikeCard = (req, res) => {
   )
     .then((card) => {
       if (card) {
-        res.send({data: card});
+        res.send({ data: card });
       } else {
-        res.status(404).send({message: 'Карточка не найдена'})
+        res.status(404).send({ message: 'Карточка не найдена' })
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({message: 'Некорректный Id карточки'});
+        res.status(400).send({ message: 'Некорректный Id карточки' });
       } else {
-        res.status(500).send({message: 'Что-то пошло не так!'});
+        res.status(500).send({ message: 'Что-то пошло не так!' });
       }
     });
 };
