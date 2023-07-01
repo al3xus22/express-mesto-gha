@@ -3,9 +3,9 @@ const Card = require('../models/card');
 const createCard = (req, res) => {
 
   const owner = req.user._id;
-  const {name, link} = req.body;
+  const { name, link } = req.body;
 
-  Card.create({name, link, owner})
+  Card.create({ name, link, owner })
     .then((card) => {
       res.send(card);
     })
@@ -26,7 +26,7 @@ const getCards = (req, res) => {
 
 const deleteCard = (req, res) => {
 
-  const {cardId} = req.params;
+  const { cardId } = req.params;
 
   Card.findByIdAndDelete(cardId)
     .then((card) => {
@@ -48,7 +48,7 @@ const deleteCard = (req, res) => {
 const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    {$addToSet: {likes: req.user._id}}, // добавить _id в массив, если его там нет
+    {$addToSet: { likes: req.user._id }}, // добавить _id в массив, если его там нет
     {new: true},
   )
     .then((card) => {
@@ -70,7 +70,7 @@ const likeCard = (req, res) => {
 const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    {$pull: {likes: req.user._id}},
+    {$pull: { likes: req.user._id }},
     {new: true},
   )
     .then((card) => {
