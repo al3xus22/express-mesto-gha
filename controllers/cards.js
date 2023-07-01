@@ -11,8 +11,8 @@ const createCard = (req, res) => {
     })
     .catch(() => {
       res.status(500).send({message: 'Произошла ошибка при создании карточки'});
-    })
-}
+    });
+};
 
 const getCards = (req, res) => {
   Card.find({})
@@ -21,8 +21,8 @@ const getCards = (req, res) => {
     })
     .catch(() => {
       res.status(500).send({message: 'Произошла ошибка получения карточек'});
-    })
-}
+    });
+};
 
 const deleteCard = (req, res) => {
 
@@ -42,8 +42,8 @@ const deleteCard = (req, res) => {
       } else {
         res.status(500).send({message: 'Произошла ошибка удаления карточки'});
       }
-    })
-}
+    });
+};
 
 const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
@@ -64,8 +64,8 @@ const likeCard = (req, res) => {
       } else {
         res.status(500).send({message: 'Что-то пошло не так!'});
       }
-    })
-}
+    });
+};
 
 const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
@@ -86,8 +86,8 @@ const dislikeCard = (req, res) => {
       } else {
         res.status(500).send({message: 'Что-то пошло не так!'});
       }
-    })
-}
+    });
+};
 
 module.exports = {
   createCard,
