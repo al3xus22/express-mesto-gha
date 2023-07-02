@@ -47,7 +47,8 @@ const getUser = (req, res) => {
 };
 
 const updateUser = (req, res) => {
-  User.findByIdAndUpdate(req.user._id, req.body, { new: true, runValidators: true })
+  const { user: { _id }, body } = req;
+  User.findByIdAndUpdate(_id, body, { new: true })
     .then((user) => {
       res.send(user);
     })
