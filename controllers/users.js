@@ -63,9 +63,6 @@ const updateUser = (req, res) => {
 };
 
 const updateUserAvatar = (req, res) => {
-  if (!req.body.avatar) {
-    return res.status(400).send({ message: 'Поле avatar не заполнено' });
-  }
   return updateUser(req, res);
 };
 
