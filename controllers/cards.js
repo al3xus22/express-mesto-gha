@@ -8,8 +8,12 @@ const createCard = (req, res) => {
     .then((card) => {
       res.send(card);
     })
-    .catch(() => {
-      res.status(500).send({ message: 'Произошла ошибка при создании карточки' });
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Поле не должно быть короче 2 или длиннее 30 символов либо не заполнено' });
+      } else {
+        res.status(500).send({ message: 'Произошла ошибка при создании карточки' });
+      }
     });
 };
 
