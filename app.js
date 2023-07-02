@@ -21,7 +21,7 @@ app.use(bodyParser.json());
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 app.use('*', (req, res) => {
-  res.status(404);
+  res.status(404).send({ message: 'Такого роута не существует' });
 });
 
 app.listen(PORT, () => {
