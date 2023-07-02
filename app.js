@@ -21,7 +21,7 @@ app.use(bodyParser.json());
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 app.use('*', (req, res) => {
-  res.status({ massage: 'Что пошло не так' });
+  res.status(404);
 });
 
 app.listen(PORT, () => {
