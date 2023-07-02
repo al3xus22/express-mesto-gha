@@ -6,11 +6,11 @@ const createCard = (req, res) => {
 
   Card.create({ name, link, owner })
     .then((card) => {
-      res.status(201).send(card);
+      res.send(card);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Поле не должно быть короче 2 или длиннее 30 символов либо не заполнено' });
+        res.status(400).send(err);
       } else {
         res.status(500).send({ message: 'Произошла ошибка при создании карточки' });
       }
