@@ -7,8 +7,12 @@ const createUser = (req, res) => {
     .then((user) => {
       res.send(user);
     })
-    .catch(() => {
-      res.status(500).send({ message: 'Произошла ошибка при создании пользователя' });
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Поле не должно быть короче 2 или длиннее 30 символов либо не заполнено' });
+      } else {
+        res.status(500).send(err);
+      }
     });
 };
 
@@ -48,7 +52,9 @@ const updateUser = (req, res) => {
       res.send(user);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Поле не должно быть короче 2 или длиннее 30 символов либо не заполнено' });
+      } else if (err.name === 'CastError') {
         res.status(400).send({ message: 'Некорректный Id пользователя' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка обновления данных пользователя' });
