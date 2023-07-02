@@ -54,8 +54,6 @@ const updateUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Поле не должно быть короче 2 или длиннее 30 символов либо не заполнено' });
-      } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Некорректный Id пользователя' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка обновления данных пользователя' });
       }
