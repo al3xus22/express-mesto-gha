@@ -1,8 +1,9 @@
 const express = require('express');
 
 const { PORT = 3000 } = process.env;
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const constants = require('constants');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 
@@ -20,7 +21,7 @@ app.use((req, res, next) => {
 app.use(bodyParser.json());
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
-app.use('*', (res, req) => {
+app.use('*', (req, res) => {
   res.status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR);
 });
 
