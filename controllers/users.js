@@ -62,9 +62,7 @@ const updateUser = (req, res) => {
     });
 };
 
-const updateUserAvatar = (req, res) => {
-  return updateUser(req, res);
-};
+const updateUserAvatar = (req, res) => updateUser(req, res);
 
 module.exports = {
   createUser,
