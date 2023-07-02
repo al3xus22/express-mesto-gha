@@ -47,20 +47,27 @@ const getUser = (req, res) => {
 };
 
 const updateUser = (req, res) => {
-  User.findByIdAndUpdate(req.user._id, req.body, { new: true })
+  User.findByIdAndUpdate(req.user._id, req.body, { new: true, runValidators: true })
     .then((user) => {
       res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Поле не должно быть короче 2 или длиннее 30 символов либо не заполнено' });
+      } else if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Некорректный Id пользователя' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка обновления данных пользователя' });
       }
     });
 };
 
-const updateUserAvatar = (req, res) => updateUser(req, res);
+const updateUserAvatar = (req, res) => {
+  if (!req.body.avatar) {
+    return res.status(400).send({ message: 'Поле avatar не заполнено' });
+  }
+  return updateUser(req, res);
+};
 
 module.exports = {
   createUser,
