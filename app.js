@@ -3,7 +3,6 @@ const express = require('express');
 const { PORT = 3000 } = process.env;
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const constants = require('constants');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 
@@ -22,7 +21,7 @@ app.use(bodyParser.json());
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 app.use('*', (req, res) => {
-  res.status(constants.HTTP_STATUS_INTERNAL_SERVER_ERROR);
+  res.status({ massage: 'Что пошло не так' });
 });
 
 app.listen(PORT, () => {
