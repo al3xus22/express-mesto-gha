@@ -5,7 +5,7 @@ const createUser = (req, res) => {
 
   User.create({ name, about, avatar })
     .then((user) => {
-      res.send(user);
+      res.status(201).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -30,15 +30,14 @@ const getUser = (req, res) => {
   const { id } = req.params;
 
   User.findById(id)
+    .orFail(new Error('InvalidUserId'))
     .then((user) => {
-      if (user) {
-        res.send(user);
-      } else {
-        res.status(404).send({ message: 'Пользователь не найден' });
-      }
+      res.send(user);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.message === 'InvalidUserId') {
+        res.status(404).send({ message: 'Пользователь не найден' });
+      } else if (err.name === 'CastError') {
         res.status(400).send({ message: 'Некорректный Id пользователя' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка получения данных пользователя' });
@@ -53,11 +52,11 @@ const updateUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Поле не должно быть короче 2 или длиннее 30 символов либо не заполнено' });
+        res.status(400).send({ message: err.message });
       } else if (err.name === 'CastError') {
-        res.status(400).send(err);
+        res.status(400).send({ message: 'Некорректный Id пользователя' });
       } else {
-        res.status(500).send(err);
+        res.status(500).send({ message: 'Произошла ошибка получения данных пользователя' });
       }
     });
 };

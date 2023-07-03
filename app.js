@@ -1,15 +1,19 @@
 const express = require('express');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+// eslint-disable-next-line import/no-extraneous-dependencies
+const helmet = require('helmet');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
+mongoose.connect(DB_URL);
 
 const app = express();
 
+app.use(helmet());
+app.disable('x-powered-by');
 app.use((req, res, next) => {
   req.user = {
     _id: '64a1974f9cc0d458ac1e1d56',

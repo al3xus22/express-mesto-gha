@@ -6,7 +6,7 @@ const createCard = (req, res) => {
 
   Card.create({ name, link, owner })
     .then((card) => {
-      res.send(card);
+      res.status(201).send(card);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -31,15 +31,14 @@ const deleteCard = (req, res) => {
   const { cardId } = req.params;
 
   Card.findByIdAndDelete(cardId)
+    .orFail(new Error('InvalidCardId'))
     .then((card) => {
-      if (card) {
-        res.send({ data: card });
-      } else {
-        res.status(404).send({ message: 'Карточка не найдена' });
-      }
+      res.send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.message === 'InvalidCardId') {
+        res.status(404).send({ message: 'Карточка не найдена' });
+      } else if (err.name === 'CastError') {
         res.status(400).send({ message: 'Некорректный Id карточки' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка удаления карточки' });
