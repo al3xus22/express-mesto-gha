@@ -1,12 +1,19 @@
 const router = require('express').Router();
+// eslint-disable-next-line import/no-extraneous-dependencies
+const { validateUserInfo, validateUserAvatar } = require('../middlewares/validators');
+
 const {
-  createUser, getUsers, getUser, updateUser, updateUserAvatar,
+  getUsers,
+  getUser,
+  updateUser,
+  updateUserAvatar,
+  getAuthUser,
 } = require('../controllers/users');
 
-router.post('/', createUser);
 router.get('/', getUsers);
+router.get('/me', getAuthUser);
+router.patch('/me', validateUserInfo, updateUser);
+router.patch('/me/avatar', validateUserAvatar, updateUserAvatar);
 router.get('/:id', getUser);
-router.patch('/me', updateUser);
-router.patch('/me/avatar', updateUserAvatar);
 
 module.exports = router;

@@ -7,6 +7,9 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
+const { createUser, login } = require('./controllers/users');
+const auth = require('./middlewares/auth');
+const NotFoundError = require('./errors/not-found-err');
 
 mongoose.connect(DB_URL);
 
@@ -14,18 +17,27 @@ const app = express();
 
 app.use(helmet());
 app.disable('x-powered-by');
-app.use((req, res, next) => {
-  req.user = {
-    _id: '64a1974f9cc0d458ac1e1d56',
-  };
-  next();
-});
 
 app.use(bodyParser.json());
-app.use('/users', usersRouter);
-app.use('/cards', cardsRouter);
-app.use('*', (req, res) => {
-  res.status(404).send({ message: 'Такого роута не существует' });
+app.post('/signup', createUser);
+app.post('/signin', login);
+app.use('/users', auth, usersRouter);
+app.use('/cards', auth, cardsRouter);
+app.use('*', (req, res, next) => {
+  next(new NotFoundError('Такоой страницы не существует'));
+});
+
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? 'На сервере произошла ошибка'
+        : message,
+    });
+  next();
 });
 
 app.listen(PORT, () => {

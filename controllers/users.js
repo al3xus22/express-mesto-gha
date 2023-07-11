@@ -1,33 +1,39 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+const bcrypt = require('bcryptjs');
+// eslint-disable-next-line import/no-extraneous-dependencies
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const BadRequest = require('../errors/bad-request');
+const ConflictRequest = require('../errors/conflict-request');
+const NotFoundError = require('../errors/not-found-err');
 
-const createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+const SALT_ROUNDS = 10;
+const JWT_SECRET = 'some-secret-key';
 
-  User.create({ name, about, avatar })
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      res.status(201).send(user);
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
+      res.cookie('jwt', token, {
+        maxAge: 3600000 * 24 * 7,
+        httpOnly: true,
+      }).send({ token });
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Поле не должно быть короче 2 или длиннее 30 символов либо не заполнено' });
-      } else {
-        res.status(500).send(err);
-      }
-    });
+    .catch(next);
 };
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => {
       res.send(users);
     })
-    .catch(() => {
-      res.status(500).send({ message: 'Произошла ошибка получения данных пользователей' });
-    });
+    .catch(next);
 };
 
-const getUser = (req, res) => {
-  const { id } = req.params;
+const getUser = (req, res, next) => {
+  const { id } = req.user._id;
 
   User.findById(id)
     .orFail(new Error('InvalidUserId'))
@@ -36,36 +42,94 @@ const getUser = (req, res) => {
     })
     .catch((err) => {
       if (err.message === 'InvalidUserId') {
-        res.status(404).send({ message: 'Пользователь не найден' });
+        next(new NotFoundError('Пользователь не найден'));
       } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Некорректный Id пользователя' });
+        next(new BadRequest('Некорректный Id пользователя'));
       } else {
-        res.status(500).send({ message: 'Произошла ошибка получения данных пользователя' });
+        next(err);
       }
     });
 };
 
-const updateUser = (req, res) => {
+const getAuthUser = (req, res, next) => {
+  const { id } = req.params.id;
+
+  User.findById(id)
+    .orFail(new Error('InvalidUserId'))
+    .then((user) => {
+      res.send(user);
+    })
+    .catch((err) => {
+      if (err.message === 'InvalidUserId') {
+        next(new NotFoundError('Пользователь не найден'));
+      } else if (err.name === 'CastError') {
+        next(new BadRequest('Некорректный Id пользователя'));
+      } else {
+        next(err);
+      }
+    });
+};
+
+const createUser = (req, res, next) => {
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+  return bcrypt.hash(password, SALT_ROUNDS, (err, hash) => User.findOne({ email })
+    .then((user) => {
+      if (user) {
+        throw new ConflictRequest('Пользователь с таким Email уже существует');
+      }
+      return User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      })
+        .then(() => {
+          res.status(201).send({ message: `Пользователь ${email} удачно зарегистрирован!` });
+        })
+        // eslint-disable-next-line no-shadow
+        .catch((err) => {
+          if (err.name === 'ValidationError') {
+            next(new BadRequest(err.message));
+          } else {
+            next(err);
+          }
+        });
+    })
+    .catch((error) => {
+      if (error.name === 'ValidationError') {
+        next(new BadRequest('Что-то пошло не так'));
+      } else if (error.code === 11000) {
+        next(new ConflictRequest('Пользователь с таким Email уже существует'));
+      } else {
+        next(error);
+      }
+    }));
+};
+
+const updateUser = (req, res, next) => {
   User.findByIdAndUpdate(req.user._id, req.body, { new: true, runValidators: true })
     .then((user) => {
       res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: err.message });
+        next(new BadRequest('Что-то пошло не так'));
       } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Некорректный Id пользователя' });
+        next(new BadRequest('Некорректный Id пользователя'));
       } else {
-        res.status(500).send({ message: 'Произошла ошибка получения данных пользователя' });
+        next(err);
       }
     });
 };
 
-const updateUserAvatar = (req, res) => {
+const updateUserAvatar = (req, res, next) => {
   if (!req.body.avatar) {
-    return res.status(400).send({ message: 'Поле avatar не заполнено' });
+    return new BadRequest('Поле avatar не заполнено');
   }
-  return updateUser(req, res);
+  return updateUser(req, res, next);
 };
 
 module.exports = {
@@ -74,4 +138,6 @@ module.exports = {
   getUser,
   updateUser,
   updateUserAvatar,
+  login,
+  getAuthUser,
 };
