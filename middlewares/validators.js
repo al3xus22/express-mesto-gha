@@ -33,9 +33,16 @@ const validateCardInfo = celebrate({
   }),
 });
 
+const validateId = celebrate({
+  params: Joi.object().keys({
+    id: Joi.string().required(),
+  }),
+});
+
 module.exports = {
   validateUserInfo,
   validateAuthorize,
   validateUserAvatar,
   validateCardInfo,
+  validateId,
 };

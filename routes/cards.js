@@ -1,6 +1,6 @@
 const router = require('express').Router();
 // eslint-disable-next-line import/no-extraneous-dependencies
-const { validateCardInfo } = require('../middlewares/validators');
+const { validateCardInfo, validateId } = require('../middlewares/validators');
 
 const {
   createCard, getCards, deleteCard, likeCard, dislikeCard,
@@ -8,8 +8,8 @@ const {
 
 router.post('/', validateCardInfo, createCard);
 router.get('/', getCards);
-router.delete('/:cardId', deleteCard);
-router.put('/:cardId/likes', likeCard);
-router.delete('/:cardId/likes', dislikeCard);
+router.delete('/:cardId', validateId, deleteCard);
+router.put('/:cardId/likes', validateId, likeCard);
+router.delete('/:cardId/likes', validateId, dislikeCard);
 
 module.exports = router;
