@@ -12,7 +12,7 @@ const JWT_SECRET = 'some-secret-key';
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-
+  if (!email || !password) next(new BadRequest('Email или пароль не могут быть пустыми'));
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
