@@ -140,4 +140,5 @@ module.exports = {
   updateUserAvatar,
   login,
   getAuthUser,
+  JWT_SECRET,
 };

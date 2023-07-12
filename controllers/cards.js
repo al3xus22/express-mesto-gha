@@ -46,7 +46,7 @@ const deleteCard = (req, res, next) => {
       if (err.message === 'InvalidCardId') {
         next(new NotFoundError('Карточка не найдена'));
       } else if (err.name === 'CastError') {
-        next(new NotFoundError('Некорректный Id карточки'));
+        next(new BadRequest('Некорректный Id карточки'));
       } else {
         next(err);
       }
@@ -90,7 +90,7 @@ const dislikeCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new NotFoundError('Некорректный Id карточки'));
+        next(new BadRequest('Некорректный Id карточки'));
       } else {
         next(err);
       }
