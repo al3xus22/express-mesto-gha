@@ -15,7 +15,7 @@ const login = (req, res, next) => {
   if (!email || !password) next(new BadRequest('Email или пароль не могут быть пустыми'));
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id.toString() }, JWT_SECRET, { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: '7d' });
       res.cookie('jwt', token, {
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,
@@ -33,7 +33,7 @@ const getUsers = (req, res, next) => {
 };
 
 const getUser = (req, res, next) => {
-  const { id } = req.user._id;
+  const { id } = req.params._id;
 
   User.findById(id)
     .orFail(new Error('InvalidUserId'))
@@ -52,17 +52,13 @@ const getUser = (req, res, next) => {
 };
 
 const getAuthUser = (req, res, next) => {
-  const { id } = req.params.id;
-
+  const { id } = req.user.id;
   User.findById(id)
-    .orFail(new Error('InvalidUserId'))
     .then((user) => {
       res.send(user);
     })
     .catch((err) => {
-      if (err.message === 'InvalidUserId') {
-        next(new NotFoundError('Пользователь не найден'));
-      } else if (err.name === 'CastError') {
+      if (err.name === 'CastError') {
         next(new BadRequest('Некорректный Id пользователя'));
       } else {
         next(err);
