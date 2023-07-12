@@ -54,11 +54,14 @@ const getUser = (req, res, next) => {
 const getAuthUser = (req, res, next) => {
   const { id } = req.user.id;
   User.findById(id)
+    .orFail(new Error('InvalidUserId'))
     .then((user) => {
       res.send(user);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.message === 'InvalidUserId') {
+        next(new NotFoundError('Пользователь не найден'));
+      } else if (err.name === 'CastError') {
         next(new BadRequest('Некорректный Id пользователя'));
       } else {
         next(err);

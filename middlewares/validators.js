@@ -20,6 +20,13 @@ const validateAuthorize = celebrate({
   }),
 });
 
+const validateUpdateUser = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+  }),
+});
+
 const validateUserAvatar = celebrate({
   body: Joi.object().keys({
     avatar: Joi.string().pattern(regexUrl),
@@ -42,6 +49,7 @@ const validateId = celebrate({
 module.exports = {
   validateUserInfo,
   validateAuthorize,
+  validateUpdateUser,
   validateUserAvatar,
   validateCardInfo,
   validateId,
