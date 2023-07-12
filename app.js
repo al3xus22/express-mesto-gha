@@ -22,6 +22,7 @@ app.use(helmet());
 app.disable('x-powered-by');
 
 app.use(bodyParser.json());
+app.use(express.json());
 app.post('/signup', validateUserInfo, createUser);
 app.post('/signin', validateAuthorize, login);
 app.use('/users', auth, usersRouter);
