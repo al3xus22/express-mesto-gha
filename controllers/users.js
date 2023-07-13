@@ -67,9 +67,12 @@ const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  return bcrypt.hash(password, SALT_ROUNDS)
-    .then((hash) => {
-      User.create({
+  bcrypt.hash(password, SALT_ROUNDS, (err, hash) => User.findOne({ email })
+    .then((user) => {
+      if (user) {
+        throw new ConflictRequest('Пользователь с таким Email уже существует');
+      }
+      return User.create({
         name,
         about,
         avatar,
@@ -96,7 +99,7 @@ const createUser = (req, res, next) => {
       } else {
         next(error);
       }
-    });
+    }));
 };
 
 const updateUser = (req, res, next) => {
