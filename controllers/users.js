@@ -80,7 +80,7 @@ const createUser = (req, res, next) => {
         password: hash,
       })
         .then(() => {
-          res.status(201).send({ message: `Пользователь ${email} удачно зарегистрирован!` });
+          res.status(201).send({ message: `Пользователь удачно зарегистрирован!` });
         })
         // eslint-disable-next-line no-shadow
         .catch((err) => {
