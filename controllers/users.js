@@ -67,12 +67,9 @@ const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
-  return bcrypt.hash(password, SALT_ROUNDS, (err, hash) => User.findOne({ email })
-    .then((user) => {
-      if (user) {
-        throw new ConflictRequest('Пользователь с таким Email уже существует');
-      }
-      return User.create({
+  return bcrypt.hash(password, SALT_ROUNDS)
+    .then((hash) => {
+      User.create({
         name,
         about,
         avatar,
@@ -80,7 +77,7 @@ const createUser = (req, res, next) => {
         password: hash,
       })
         .then(() => {
-          res.status(201).send({ message: 'Пользователь удачно зарегистрирован!' });
+          res.status(201).send({ message: `Пользователь ${email} удачно зарегистрирован!` });
         })
         // eslint-disable-next-line no-shadow
         .catch((err) => {
@@ -99,7 +96,7 @@ const createUser = (req, res, next) => {
       } else {
         next(error);
       }
-    }));
+    });
 };
 
 const updateUser = (req, res, next) => {
