@@ -32,7 +32,6 @@ const getCards = (req, res, next) => {
 
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
-
   Card.findByIdAndDelete(cardId)
     .orFail(new Error('InvalidCardId'))
     .then((card) => {
