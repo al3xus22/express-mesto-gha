@@ -2,18 +2,20 @@ const jwt = require('jsonwebtoken');
 const { JWT_SECRET } = require('../controllers/users');
 const NotAuthorized = require('../errors/not-auth');
 
+const extractToken = (header) => header.replace('jwt=', '');
+
 const auth = (req, res, next) => {
-  const { authorization } = req.headers;
-  if (!authorization || !authorization.startsWith('Bearer ')) {
+  console.log(req.cookies);
+
+  if (!req.headers.cookie || !req.headers.cookie.startsWith('jwt=')) {
     next(new NotAuthorized('Необходима авторизация'));
     return;
   }
 
-  const token = authorization.replace('Bearer ', '');
   let payload;
 
   try {
-    payload = jwt.verify(token, JWT_SECRET);
+    payload = jwt.verify(extractToken(req.headers.cookie), JWT_SECRET);
   } catch (err) {
     next(new NotAuthorized('Необходима авторизация'));
     return;

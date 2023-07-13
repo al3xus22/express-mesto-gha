@@ -33,28 +33,7 @@ const getUsers = (req, res, next) => {
 };
 
 const getUser = (req, res, next) => {
-  const { id } = req.params._id;
-
-  User.findById(id)
-    .orFail(new Error('InvalidUserId'))
-    .then((user) => {
-      if (!user) {
-        throw new NotFoundError('Пользователь с указанным _id не найден.');
-      }
-      res.send(user);
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequest('Некорректный Id пользователя'));
-      } else {
-        next(err);
-      }
-    });
-};
-
-const getAuthUser = (req, res, next) => {
-  const { id } = req.user.id;
-  User.findById(id)
+  User.findById(req.params._id)
     .orFail(new Error('InvalidUserId'))
     .then((user) => {
       res.send(user);
@@ -63,6 +42,20 @@ const getAuthUser = (req, res, next) => {
       if (err.message === 'InvalidUserId') {
         next(new NotFoundError('Пользователь не найден'));
       } else if (err.name === 'CastError') {
+        next(new BadRequest('Некорректный Id пользователя'));
+      } else {
+        next(err);
+      }
+    });
+};
+
+const getAuthUser = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
         next(new BadRequest('Некорректный Id пользователя'));
       } else {
         next(err);
