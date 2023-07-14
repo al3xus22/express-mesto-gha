@@ -79,8 +79,13 @@ const createUser = (req, res, next) => {
         email,
         password: hash,
       })
-        .then(() => {
-          res.status(201).send({ message: `Пользователь ${email} удачно зарегистрирован!` });
+        .then((data) => {
+          res.status(201).send({
+            email: data.email,
+            name: data.name,
+            about: data.about,
+            avatar: data.avatar,
+          });
         })
         // eslint-disable-next-line no-shadow
         .catch((err) => {
